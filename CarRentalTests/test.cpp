@@ -85,12 +85,14 @@ namespace CarStationTests
 		std::unique_ptr<CarStation> carStation = createStationWithCars();
 		auto avaibleCars = carStation->avaibleCars();
 		int beforeBook = avaibleCars.size();
+		//Commit after this test
 		ASSERT_TRUE(avaibleCars.size() > 0);
 		
+
 		std::shared_ptr<Car> carToBook = *avaibleCars.begin();
 		carStation->book(carToBook);
 		int afterBook = carStation->avaibleCars().size();
-		
+		//Commit after this test
 		ASSERT_TRUE(beforeBook > afterBook);
 
 	}
@@ -102,15 +104,19 @@ namespace CarStationTests
 		std::shared_ptr<Car> carToBook = *avaibleCars.begin();
 
 		carStation->release(carToBook);
+		//Commit after this test
 		ASSERT_TRUE(carStation->releaseStatus() == carStation->RELEASE_STATUS_ERR);
 		
 		carStation->book(carToBook);
+		//Commit after this test
 		ASSERT_TRUE(carStation->bookStatus() == carStation->BOOK_STATUS_OK);
 
 		carStation->book(carToBook);
+		//Commit after this test
 		ASSERT_TRUE(carStation->bookStatus() == carStation->BOOK_STATUS_ISBOOKED);
 
 		carStation->release(carToBook);
+		//Commit after this test
 		ASSERT_TRUE(carStation->releaseStatus() == carStation->RELEASE_STATUS_OK);
 	}
 }
