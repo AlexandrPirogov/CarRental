@@ -95,4 +95,22 @@ namespace CarStationTests
 
 	}
 
+	TEST(CarStationTests, BookReleaseCarStatusesTest)
+	{
+		std::unique_ptr<CarStation> carStation = createStationWithCars();
+		auto avaibleCars = carStation->avaibleCars();
+		std::shared_ptr<Car> carToBook = *avaibleCars.begin();
+
+		carStation->release(carToBook);
+		ASSERT_TRUE(carStation->releaseStatus() == carStation->RELEASE_STATUS_ERR);
+		
+		carStation->book(carToBook);
+		ASSERT_TRUE(carStation->bookStatus() == carStation->BOOK_STATUS_OK);
+
+		carStation->book(carToBook);
+		ASSERT_TRUE(carStation->bookStatus() == carStation->BOOK_STATUS_ISBOOKED);
+
+		carStation->release(carToBook);
+		ASSERT_TRUE(carStation->releaseStatus() == carStation->RELEASE_STATUS_OK);
+	}
 }
