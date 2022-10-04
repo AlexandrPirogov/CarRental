@@ -5,18 +5,37 @@
 
 namespace CarStationTests
 {
-	std::unique_ptr<Car> creatingCar(std::string title, int num)
+	std::shared_ptr<Car> creatingCar(std::string title, int num)
 	{
 		std::string hondaTitle = std::string(title);
 		int carNumber = 1;
-		std::unique_ptr<Car> car = std::make_unique<Car>(hondaTitle, 1);
+		std::shared_ptr<Car> car = std::make_unique<Car>(hondaTitle, num);
 		return car;
+	}
+
+	std::unique_ptr<CarStation> createStationWithCars()
+	{
+
+		std::string hondaTitle = "Honda";
+		std::string BMWtitle = "BMW";
+		std::string Ladatitle = "Lada";
+
+		std::shared_ptr<Car> carHonda = creatingCar(hondaTitle, 1);
+		std::shared_ptr<Car> carHonda2 = creatingCar(hondaTitle, 2);
+		std::shared_ptr<Car> carBwm = creatingCar(BMWtitle, 1);
+		std::shared_ptr<Car> carLada = creatingCar(Ladatitle, 1);
+		std::unique_ptr<CarStation> carStation = std::make_unique<CarStation>();
+		carStation->addCar(carHonda);
+		carStation->addCar(carHonda2);
+		carStation->addCar(carBwm);
+		carStation->addCar(carLada);
+		return carStation;
 	}
 
 	TEST(CarTests, CreateCar)
 	{
 		std::string title = "Honda";
-		std::unique_ptr<Car> car = creatingCar(title, 1);
+		std::shared_ptr<Car> car = creatingCar(title, 1);
 		ASSERT_TRUE(car->carTitle() == title);
 		ASSERT_TRUE(car->carNumber() == 1);
 	}
@@ -24,7 +43,7 @@ namespace CarStationTests
 	TEST(CarStationTests, CreateCarStation)
 	{
 		std::unique_ptr<CarStation> carStation = std::make_unique<CarStation>();
-		ASSERT_TRUE(carStation->avaibleCars() == 0);
+		
 		ASSERT_TRUE(carStation->totalCars() == 0);
 		ASSERT_FALSE(carStation->isWorking());
 	}
@@ -32,24 +51,48 @@ namespace CarStationTests
 	TEST(CarStationTests, AddingCarToStation)
 	{
 		std::string title = "Honda";
-		std::unique_ptr<Car> car = creatingCar(title, 1);
+		std::shared_ptr<Car> car = creatingCar(title, 1);
 		std::unique_ptr<CarStation> carStation = std::make_unique<CarStation>();
 		carStation->addCar(car);
-		ASSERT_TRUE(carStation->avaibleCars() == 0);
+		
 		ASSERT_TRUE(carStation->totalCars() == 1);
 	}
 
 	TEST(CarStationTests, AddingSameCarTwice)
 	{
 		std::string title = "Honda";
-		std::unique_ptr<Car> car = creatingCar(title, 1);
+		std::shared_ptr<Car> car = creatingCar(title, 1);
 		std::unique_ptr<CarStation> carStation = std::make_unique<CarStation>();
 		carStation->addCar(car);
 
-		std::unique_ptr<Car> car2 = creatingCar(title, 1);
-		carStation->addCar(car);
-		ASSERT_TRUE(carStation->avaibleCars() == 0);
+		std::shared_ptr<Car> car2 = creatingCar(title, 1);
+		carStation->addCar(car2);
+		
 		ASSERT_TRUE(carStation->totalCars() == 1);
 		ASSERT_TRUE(carStation->addStatus() == carStation->ADD_STATUS_DUPLICATE);
 	}
+
+	TEST(CarStationTests, AddingMultipleCars)
+	{
+		std::unique_ptr<CarStation> carStation = createStationWithCars();
+		ASSERT_TRUE(carStation->totalCars() == 4);
+		ASSERT_TRUE(carStation->addStatus() == carStation->ADD_STATUS_OK);
+	}
+
+	//RTC
+	TEST(CarStationTests, BookingCarTests)
+	{
+		std::unique_ptr<CarStation> carStation = createStationWithCars();
+		auto avaibleCars = carStation->avaibleCars();
+		int beforeBook = avaibleCars.size();
+		ASSERT_TRUE(avaibleCars.size() > 0);
+		
+		std::shared_ptr<Car> carToBook = *avaibleCars.begin();
+		carStation->book(carToBook);
+		int afterBook = carStation->avaibleCars().size();
+		
+		ASSERT_TRUE(beforeBook > afterBook);
+
+	}
+
 }
