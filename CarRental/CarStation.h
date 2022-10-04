@@ -1,6 +1,9 @@
 #pragma once
 #include <map>
 #include <string>
+#include <algorithm>
+#include <numeric>
+#include <memory>
 
 class Car
 {
@@ -24,11 +27,20 @@ public:
 	};
 };
 
+typedef std::map<std::string, std::map<int, std::unique_ptr<Car>>> stationCars;
+typedef std::map<int, std::unique_ptr<Car>> carRecord;
+
 class CarStation
 {
-	
+	stationCars cars;
 public:
 	CarStation() = default;
+
+	inline void addCar(std::unique_ptr<Car>& car)
+	{
+		std::string title = car->carTitle();
+		cars[title].emplace(std::make_pair(car->carNumber(), std::move(car)));
+	}
 
 	inline int avaibleCars() noexcept
 	{
@@ -37,7 +49,12 @@ public:
 
 	inline int totalCars() noexcept
 	{
-		return 0;
+		int total = 0;
+		for (const auto& keyVale : cars)
+		{
+			total += cars.size();
+		}
+		return total;
 	};
 
 	inline bool isWorking() noexcept
