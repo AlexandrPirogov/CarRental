@@ -19,7 +19,7 @@ namespace CarStationTests
 		std::string hondaTitle = "Honda";
 		int carNumber = 1;
 		std::unique_ptr<Car> car = std::make_unique<Car>(hondaTitle, 1);
-		ASSERT_TRUE(car->title() == hondaTitle);
+		ASSERT_TRUE(car->carTitle() == hondaTitle);
 		ASSERT_TRUE(car->carNumber() == 1);
 	}
 }
