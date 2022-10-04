@@ -38,4 +38,18 @@ namespace CarStationTests
 		ASSERT_TRUE(carStation->avaibleCars() == 0);
 		ASSERT_TRUE(carStation->totalCars() == 1);
 	}
+
+	TEST(CarStationTests, AddingSameCarTwice)
+	{
+		std::string title = "Honda";
+		std::unique_ptr<Car> car = creatingCar(title, 1);
+		std::unique_ptr<CarStation> carStation = std::make_unique<CarStation>();
+		carStation->addCar(car);
+
+		std::unique_ptr<Car> car2 = creatingCar(title, 1);
+		carStation->addCar(car);
+		ASSERT_TRUE(carStation->avaibleCars() == 0);
+		ASSERT_TRUE(carStation->totalCars() == 1);
+		ASSERT_TRUE(carStation->addStatus() == carStation->ADD_STATUS_DUPLICATE);
+	}
 }
