@@ -2,19 +2,31 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include <list>
 #include <numeric>
 #include <memory>
 
 class Car
 {
-	std::string title;
 	int number;
+	bool isBusy;
+	std::string title;
 public:
 	Car() = delete;
-	Car(const std::string& title, const int carNumber) : title(title), number(carNumber)
+	Car(const std::string& title, const int carNumber) : title(title), number(carNumber), isBusy(false)
 	{
 
 	};
+
+	inline void book() noexcept
+	{
+		isBusy = true;
+	}
+
+	inline void release() noexcept
+	{
+		isBusy = false;
+	}
 
 	inline std::string carTitle() noexcept
 	{
@@ -25,15 +37,22 @@ public:
 	{
 		return number;
 	};
+
+	inline int isBooked() noexcept
+	{
+		return isBusy;
+	}
 };
 
-typedef std::map<std::string, std::map<int, std::unique_ptr<Car>>> stationCars;
-typedef std::map<int, std::unique_ptr<Car>> carRecord;
+
+typedef std::map<std::string, std::map<int, std::shared_ptr<Car>>> stationCars;
+typedef std::map<int, std::shared_ptr<Car>> carRecord;
 
 class CarStation
 {
 	short add_status;
 	stationCars cars;
+	
 public:
 	const short ADD_STATUS_NIL = -1;
 	const short ADD_STATUS_OK = 0;
@@ -41,10 +60,10 @@ public:
 
 	CarStation() : add_status(ADD_STATUS_NIL) { add_status = ADD_STATUS_NIL; };
 
-	inline void addCar(std::unique_ptr<Car>& car)
+	inline void addCar(std::shared_ptr<Car>& car)
 	{
 		std::string title = car->carTitle();
-		if (cars[title].find(car->carNumber()) == cars[title].end())
+		if (cars[title].find(car->carNumber()) != cars[title].end())
 		{
 			add_status = ADD_STATUS_DUPLICATE;
 			return;
@@ -54,18 +73,32 @@ public:
 		add_status = ADD_STATUS_OK;
 	}
 
-	inline int avaibleCars() noexcept
+	inline void book(std::shared_ptr<Car>& car)
 	{
-		return 0;
+		car->book();
+	}
+
+	inline void release(std::shared_ptr<Car>& car)
+	{
+		car->release();
+	}
+
+	inline std::list<std::shared_ptr<Car>> avaibleCars() noexcept
+	{
+		std::list<std::shared_ptr<Car>> avaible;
+		for (const auto& car : cars)
+			for(const auto& numCar : car.second)
+				if(!numCar.second->isBooked())
+					avaible.push_back(numCar.second);
+		return avaible;
 	};
 
 	inline int totalCars() noexcept
 	{
 		int total = 0;
-		for (const auto& keyVale : cars)
-		{
-			total += cars.size();
-		}
+		for (const auto& car : cars)
+			total += car.second.size();
+		
 		return total;
 	};
 
