@@ -1,5 +1,28 @@
 #pragma once
 #include <map>
+#include <string>
+
+class Car
+{
+	std::string title;
+	int number;
+public:
+	Car() = delete;
+	Car(const std::string& title, const int carNumber) : title(title), number(carNumber)
+	{
+
+	};
+
+	inline std::string carTitle() noexcept
+	{
+		return title;
+	};
+
+	inline int carNumber() noexcept
+	{
+		return number;
+	};
+};
 
 class CarStation
 {
